@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Концепция голосового ассистента регистратуры для чекпоинта хакатона «Точка сборки», кейс № 2.">
+<title>Концепция MedOperatorAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column, like a registry case file; status pills mark what works today. */
+:root {
+  --paper: #f5f8f9;
+  --surface: #ffffff;
+  --ink: #13222a;
+  --muted: #56666e;
+  --line: #d6dfe3;
+  --accent: #0d6b75;
+  --accent-soft: #e0eff0;
+  --ok: #2c7a4c;
+  --ok-soft: #e2f1e7;
+  --todo: #9a5b17;
+  --todo-soft: #f6ead9;
+  --danger: #a13636;
+  --font-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d161a; --surface: #14222a; --ink: #e3ebee; --muted: #9bafb7;
+    --line: #26383f; --accent: #5ec2cb; --accent-soft: #163539; --ok: #74cf9b; --ok-soft: #173226;
+    --todo: #e4a65c; --todo-soft: #382915; --danger: #ef8b8b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d161a; --surface: #14222a; --ink: #e3ebee; --muted: #9bafb7;
+  --line: #26383f; --accent: #5ec2cb; --accent-soft: #163539; --ok: #74cf9b; --ok-soft: #173226;
+  --todo: #e4a65c; --todo-soft: #382915; --danger: #ef8b8b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-inline: 16px;
+  padding-block: 32px 64px;
+}
+.page { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+.case {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 28px clamp(20px, 4vw, 40px);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.eyebrow {
+  font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 6vw, 44px);
+  line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: -0.01em;
+}
+.subtitle { font-size: 19px; margin: 0; color: var(--ink); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--muted); }
+.meta b { color: var(--ink); font-weight: 500; }
+.principle {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 4px 0 0;
+}
+.principle strong { font-weight: 600; }
+section { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+h2 {
+  font-family: var(--font-display); font-weight: 500; font-size: 22px; line-height: 1.25;
+  margin: 0; text-wrap: balance; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 17px; font-weight: 600; margin: 10px 0 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+code, .code { font-family: var(--font-mono); font-size: .88em; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+th { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 500; background: var(--paper); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.rule { font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap; color: var(--accent); }
+.flow { list-style: none; padding: 0; counter-reset: step; gap: 0; max-width: none; }
+.flow li {
+  counter-increment: step; position: relative; padding: 10px 0 10px 48px;
+  border-left: 2px solid var(--line); margin-left: 15px;
+}
+.flow li::before {
+  content: counter(step); position: absolute; left: -16px; top: 9px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface); border: 2px solid var(--accent); color: var(--accent);
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  display: grid; place-items: center;
+}
+.flow li:last-child { border-left-color: transparent; }
+.stack { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.layer { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 6px 18px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.layer:last-child { border-bottom: 0; }
+.layer .name { font-weight: 600; }
+.layer .detail { color: var(--muted); min-width: 0; }
+.layer .via { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
+.layer.ext { background: var(--accent-soft); }
+.pill {
+  display: inline-block; font-size: 12px; font-weight: 500; letter-spacing: .02em;
+  padding: 2px 9px; border-radius: 999px; white-space: nowrap; vertical-align: 2px;
+}
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.todo { background: var(--todo-soft); color: var(--todo); }
+.done-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.done-grid .area { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.area h3 { margin: 0; font-size: 16px; }
+.area p { color: var(--muted); font-size: 15px; }
+.tally { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.tally .big { font-family: var(--font-display); font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ok); }
+.tally .small { color: var(--muted); }
+.todo-list { list-style: none; padding: 0; gap: 10px; }
+.todo-list li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; }
+.note { font-size: 14px; color: var(--muted); }
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+@media (max-width: 560px) {
+  .layer { grid-template-columns: 1fr; }
+  .todo-list li { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="case">
+    <div class="eyebrow">Хакатон «Точка сборки» · кейс № 2 · DBI</div>
+    <h1>MedOperatorAI</h1>
+    <p class="subtitle">Голосовой ассистент регистратуры поликлиники</p>
+    <div class="meta"><span>Концепция для чекпоинта</span><span>Состояние на <b>14.10.2026</b></span><span>Пациенты стенда вымышленные</span></div>
+    <p class="principle"><strong>Главный принцип — ноль ошибочных записей.</strong> Ассистент лучше честно скажет «не удалось» и передаст звонок оператору, чем запишет не того пациента, не к тому врачу или не на то время.</p>
+  </header>
+
+  <section>
+    <h2>Кратко</h2>
+    <p>Мы делаем голосового ассистента для регистратуры поликлиники. Пациент звонит в поликлинику по IP/SIP. Ассистент понимает запрос и находит врача и свободное время. Он записывает, переносит или отменяет приём в системе «Регистратура». Каждое изменение выполняется только после явного подтверждения пациента. Накануне визита ассистент сам звонит пациенту и уточняет, придёт ли он. Жалобы, медицинские вопросы, острую боль и всё нестандартное ассистент передаёт человеку.</p>
+  </section>
+
+  <section>
+    <h2>Проблема</h2>
+    <p>Мы проанализировали журналы кейса: 17 772 звонка за три месяца и 35 470 приёмов за полгода. Данные подтверждают задачу.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Показатель</th><th>Задание</th><th>Расчёт по журналам</th></tr></thead>
+      <tbody>
+        <tr><td>Пропущенные звонки в часы пик</td><td class="num">30–40%</td><td class="num">24,9% (весь журнал — 20,7%)</td></tr>
+        <tr><td>Неявки на приём</td><td class="num">18–25%</td><td class="num">13,1%</td></tr>
+        <tr><td>Типовые обращения</td><td class="num">около 60%</td><td class="num">70,6% — запись или справка</td></tr>
+        <tr><td>Разговор с записью</td><td class="num">4–5 мин</td><td class="num">166,6 с</td></tr>
+        <tr><td>Звонков в день</td><td class="num">до 200</td><td class="num">193 в среднем, до 359</td></tr>
+      </tbody>
+    </table></div>
+    <p>Типовые звонки составляют основную долю. Значит, ассистент может снять большую часть нагрузки с регистраторов. Запись через ассистента должна занимать меньше 166,6 с. Регламент поликлиники ставит цель 2,5 минуты.</p>
+  </section>
+
+  <section>
+    <h2>Что считаем успехом</h2>
+    <p>Решение работает, если после голосового разговора в стенде «Регистратура» появляется нужное изменение. Изменение сделано токеном нашей команды, для того пациента, с которым говорил ассистент, и для врача, которого он просил. Наш первый приоритет — ноль ошибок в записи. Второй — как можно больше звонков без участия оператора.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Действие</th><th>Что должно появиться в стенде</th></tr></thead>
+      <tbody>
+        <tr><td>Запись</td><td>Новая запись: правильные пациент, врач, дата и время, статус «Запланирована»</td></tr>
+        <tr><td>Перенос</td><td>Тот же ID записи с новой датой или новым врачом</td></tr>
+        <tr><td>Отмена</td><td>Тот же ID записи со статусом «Отменена»</td></tr>
+      </tbody>
+    </table></div>
+    <p>Запрос к API сам по себе успехом не считается. Целевые показатели кейса мы считаем отчётом из журнала звонков:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Показатель</th><th>Цель</th><th>Как считаем</th></tr></thead>
+      <tbody>
+        <tr><td>Пропущенные звонки</td><td class="num">≤ 15%</td><td>Все входящие в окне замера</td></tr>
+        <tr><td>Неявки</td><td class="num">≤ 12%</td><td>Состоявшиеся и неявки, без отменённых</td></tr>
+        <tr><td>Звонки без человека</td><td class="num">≥ 60%</td><td>Только с подтверждённым результатом</td></tr>
+        <tr><td>Ожидание ответа</td><td class="num">≤ 30 с</td><td>Среднее, от поступления до первого ответа по сути</td></tr>
+        <tr><td>Оценка пациента</td><td class="num">≥ 4 из 5</td><td>Добровольный опрос после звонка</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Пустая выборка даёт «не измерено», а не ноль. Результаты тестовых звонков мы не выдаём за эффект в реальной клинике.</p>
+  </section>
+
+  <section>
+    <h2>Как работает ассистент</h2>
+    <h3>Входящий звонок</h3>
+    <ol class="flow">
+      <li>Ассистент здоровается и называет себя виртуальным помощником.</li>
+      <li>Пациент говорит своими словами. Меню «нажмите 1» нет.</li>
+      <li>Ассистент определяет цель: запись, перенос, отмена, статус записи или справка.</li>
+      <li>Пациент называет фамилию, имя и дату рождения. Ассистент находит или создаёт карточку в стенде.</li>
+      <li>Ассистент предлагает до трёх свободных вариантов времени.</li>
+      <li>Ассистент зачитывает полную сводку: врач, дата, время. Пациент подтверждает её явно. «Спасибо» не считается подтверждением.</li>
+      <li>Сервер выполняет изменение в стенде и сообщает пациенту фактический результат.</li>
+    </ol>
+
+    <h3>Исходящее напоминание</h3>
+    <ul>
+      <li>Звонок за предыдущий рабочий день до визита: будни 10:00–19:00, не больше двух попыток с интервалом не меньше 2 часов.</li>
+      <li>Пациент подтверждает визит, переносит его или отменяет.</li>
+      <li>Если ответил другой человек или автоответчик, ассистент не называет данные записи.</li>
+      <li>Недозвон не отменяет приём.</li>
+    </ul>
+
+    <h3>Перевод на человека</h3>
+    <p>Перевод — обязательная возможность. Правила перевода мы взяли из таблицы маршрутизации регламента регистратуры поликлиники (РГ-ТЕЛ-01, раздел 7.3). В таблице 17 правил, R01–R17: каждое задаёт условие, адресата и приоритет. Главные правила:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Правило</th><th>Ситуация</th><th>Что делает ассистент</th></tr></thead>
+      <tbody>
+        <tr><td class="rule">R01, R11</td><td>Угроза жизни, острое состояние</td><td>Сразу говорит «звоните 103 или 112» и переводит с наивысшим приоритетом. Обратный звонок запрещён</td></tr>
+        <tr><td class="rule">R02</td><td>Просьба позвать человека, клавиша «0»</td><td>Переводит сразу, без уговоров</td></tr>
+        <tr><td class="rule">R03</td><td>Жалоба</td><td>Переводит старшему администратору</td></tr>
+        <tr><td class="rule">R04</td><td>Медицинский вопрос</td><td>Не консультирует, переводит регистратору</td></tr>
+        <tr><td class="rule">R05</td><td>Ассистент дважды не понял пациента</td><td>Предлагает оператора, на третий раз переводит сам</td></tr>
+        <tr><td class="rule">R06</td><td>Сбой системы записи дважды</td><td>Переводит, незавершённая операция сохраняется</td></tr>
+      </tbody>
+    </table></div>
+    <p>Оператор получает карточку перевода: цель звонка, собранные данные, причину и приоритет. Пациенту не нужно повторять всё заново. Если оператор не отвечает, ассистент предлагает обратный звонок. В экстренных случаях обратный звонок запрещён.</p>
+
+    <h3>Справки</h3>
+    <p>Ассистент отвечает на вопросы о режиме работы, адресе, ценах и документах по базе знаний из регламента поликлиники. Результаты анализов ассистент не называет и не толкует.</p>
+  </section>
+
+  <section>
+    <h2>Как мы обеспечиваем ноль ошибок</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Риск</th><th>Защита</th></tr></thead>
+      <tbody>
+        <tr><td>Пациента поняли неправильно</td><td>Полная сводка и явное подтверждение. Отказ, условие или сомнение отменяют действие</td></tr>
+        <tr><td>Модель «решила» записать сама</td><td>Модель не может выполнить запись. Запись делает только сервер после проверок</td></tr>
+        <tr><td>Стенд не проверяет занятость</td><td>Наш календарь резервирует слот атомарно. Два звонка не займут одно время</td></tr>
+        <tr><td>Ответ стенда потерян</td><td>Запрос записи уходит один раз. Неизвестный исход сверяется по записям пациента. Слепого повтора и дубля нет</td></tr>
+        <tr><td>Чужие данные</td><td>Ассистент не называет данные записи, пока пациент сам не назвал свои</td></tr>
+        <tr><td>Лимит 10 запросов в минуту</td><td>Общий бюджет для всех звонков и кэш справочника врачей. Мы читаем данные из локальной копии и отправляем в стенд только изменения</td></tr>
+        <tr><td>Медицинский риск</td><td>Проверка срочности на каждой фразе пациента. Нет диагнозов, лекарств и оценки симптомов</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Архитектура</h2>
+    <div class="stack">
+      <div class="layer"><div class="name">Софтфон пациента</div><div class="detail">Linphone. Для теста хватает двух софтфонов: «пациент» и «оператор». Внешний номер не обязателен</div><div class="via">SIP ↓</div></div>
+      <div class="layer"><div class="name">Asterisk 22 LTS</div><div class="detail">PJSIP, очередь операторов, клавиша «0»</div><div class="via">ARI — управление звонком · WebSocket — звук 16 кГц ↓</div></div>
+      <div class="layer"><div class="name">Голосовой сервер</div><div class="detail">Распознавание речи faster-whisper и диалоговая модель Qwen3 работают локально. Синтез речи: сейчас Piper, выбран голос «Мария» (Даша SpeechKit), он пока выключен. Одна очередь речи, пациент может перебить</div><div class="via">↓</div></div>
+      <div class="layer"><div class="name">Сервер операций</div><div class="detail">Права пациента и подтверждение, маршрутизация R01–R17, календарь и условия записи, резервы, журнал операций с однократной отправкой</div><div class="via">HTTPS · токен команды · ≤ 10 запросов в минуту ↓</div></div>
+      <div class="layer ext"><div class="name">Стенд «Регистратура»</div><div class="detail">API кейса: врачи, пациенты, записи. Здесь виден результат каждого разговора</div></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Компонент</th><th>Решение</th></tr></thead>
+      <tbody>
+        <tr><td>Сервер</td><td>Python 3.13, ядро без внешних зависимостей, SQLite</td></tr>
+        <tr><td>Модели</td><td>Локальные: faster-whisper, Qwen3, Piper. Cloud.ru — только для сравнения моделей на синтетике</td></tr>
+        <tr><td>Расписание</td><td>Синтетический график: приёмы по 15/20 минут, 14 дней вперёд, запись не позже чем за 30 минут. Когда придёт файл расписания кейса, мы подключим его вместо синтетики</td></tr>
+        <tr><td>Панель</td><td>Веб-панель администратора: звонки, аудио, расшифровки, ошибки. Это рабочий инструмент администратора. Главный результат проекта — голосовой сценарий</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Весь стек открытый, кроме выбранного голоса. Голос включается отдельным решением.</p>
+  </section>
+
+  <section>
+    <h2>Данные и 152-ФЗ</h2>
+    <ul>
+      <li>В стенде только вымышленные пациенты. Реальные персональные данные в систему не попадают.</li>
+      <li>Распознавание речи и диалог работают локально, в контуре команды. Бесплатные облачные сервисы распознавания мы не используем.</li>
+      <li>Запись разговора выключена по умолчанию. Если её включить, ассистент предупреждает пациента. Пациент может отказаться.</li>
+      <li>Номера телефонов для обзвона хранятся у нас, а не в стенде.</li>
+      <li>Ключи и токены хранятся вне репозитория.</li>
+      <li>Промышленная аттестация (УЗ-1, аттестат ИСПДн) — задача внедрения в реальной клинике. На хакатоне мы её не заявляем.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Что уже сделано</h2>
+    <p>Мы разобрали задание и материалы кейса: журналы, регламент регистратуры, OpenAPI стенда. Все 97 утверждений задания мы сверили с проектом. Мы написали контракт продукта 2.2.0, таблицу перевода R01–R17, 12 сценариев приёмки и 16 контрольных диалогов по регламенту. Мы выбрали телефонию: Asterisk 22 LTS.</p>
+    <div class="tally"><span class="big">1 279 / 1 279</span><span class="small">офлайн-тестов прошли в последней принятой проверке. Мы сделали 16 модулей, каждый прошёл отдельную приёмку</span></div>
+    <div class="done-grid">
+      <div class="area"><h3>Диалог и подтверждение <span class="pill ok">офлайн</span></h3><p>Маршрутизация R01–R17 в протоколе подтверждения. Права вымышленных пациентов, включая ребёнка через представителя</p></div>
+      <div class="area"><h3>Запись в стенд <span class="pill ok">офлайн</span></h3><p>Календарь и подготовка записи. Создание записи с однократной отправкой. Перенос и отмена одним PATCH. Кодек API, общий лимит, поиск и создание пациента</p></div>
+      <div class="area"><h3>Телефония <span class="pill ok">офлайн</span></h3><p>Управление звонком через ARI, аудиопоток с перебиванием, восстановление аудиосоединения, сетевой адаптер ARI. Живое подключение пока закрыто</p></div>
+      <div class="area"><h3>Архив и панель <span class="pill ok">офлайн</span></h3><p>Карточки звонков, рабочие отметки, хранение аудио и расшифровок, журнал доступа, вход, список звонков, просмотр аудио и текста</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что ещё не сделано</h2>
+    <ul class="todo-list">
+      <li><span class="pill todo">нет</span><span><b>Живого звонка.</b> Asterisk ещё не развёрнут. Адаптеры проверены только на поддельном транспорте.</span></li>
+      <li><span class="pill todo">нет</span><span><b>Запросов к стенду.</b> Мы не получили токен команды. Без него нельзя сопоставить врачей стенда с графиком.</span></li>
+      <li><span class="pill todo">не подтверждено</span><span><b>Качество голосового диалога.</b> Последняя серия голосовых проверок прошла частично. Открыт дефект: короткое «спасибо» однажды приняли за согласие.</span></li>
+      <li><span class="pill todo">не подключено</span><span><b>Распознавание жалоб для перевода.</b> Правила перевода и серверная часть готовы.</span></li>
+      <li><span class="pill todo">нет</span><span><b>Фонового обзвона.</b> Планировщик готов, хранилища контактов нет.</span></li>
+      <li><span class="pill todo">не получен</span><span><b>Файл расписания.</b> Мы работаем на синтетическом графике.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>План до финала</h2>
+    <p>Дальше мы сосредоточены на голосовом сценарии и правильном результате в стенде.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Шаг</th><th>Работа</th><th>Результат шага</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>Подключение к стенду: токен, сопоставление врачей, запись в стенд только через наш сервер</td><td>Первые запись, перенос и отмена в стенде из тестового контура</td></tr>
+        <tr><td class="num">2</td><td>Asterisk на сервере, звонок с софтфона, перебивание, клавиша «0», очередь оператора</td><td>Живой SIP-звонок доходит до ассистента и до оператора</td></tr>
+        <tr><td class="num">3</td><td>Проверка диалога на синтетическом корпусе и 16 контрольных диалогах</td><td>Повторная проверка дефекта «спасибо», измеренные задержки</td></tr>
+        <tr><td class="num">4</td><td>Исходящее напоминание на софтфон</td><td>Подтверждение, перенос, отмена по звонку ассистента</td></tr>
+        <tr><td class="num">5</td><td>Демо-пилот «запись + напоминание», затем перенос, отмена, перевод</td><td>Сквозной сценарий: звонок → изменение в стенде → запись в журнале API стенда</td></tr>
+        <tr><td class="num">6</td><td>Отчёт KPI по тестовым звонкам и сценарный расчёт экономии</td><td>JSON-отчёт с явными знаменателями</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Сценарий показа жюри</h3>
+    <ol class="flow">
+      <li>Участник звонит с софтфона и просит записать его к терапевту на завтра после обеда.</li>
+      <li>Ассистент находит время, зачитывает сводку и получает «да».</li>
+      <li>В панели стенда появляется новая запись.</li>
+      <li>Второй звонок: перенос на другой день. У той же записи меняется время.</li>
+      <li>Исходящее напоминание: пациент отказывается от визита. Запись получает статус «Отменена».</li>
+      <li>Звонок с жалобой переводится на софтфон оператора с карточкой.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Риски</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Риск</th><th>Мера</th></tr></thead>
+      <tbody>
+        <tr><td>Распознавание ошибается в именах и датах</td><td>Подтверждение полной сводки. Перевод после двух непонятых фраз</td></tr>
+        <tr><td>Локальные модели отвечают медленно</td><td>Цель: ответ без поиска — p50 ≤ 1,5 с, с поиском — p95 ≤ 5 с. Короткие фразы ожидания. Замер на живом звонке</td></tr>
+        <tr><td>Лимит 10 запросов в минуту</td><td>Общий бюджет, кэш, локальная копия данных, приоритет входящих звонков</td></tr>
+        <tr><td>Потерян ответ стенда</td><td>Неизвестный исход и сверка, без повторной записи</td></tr>
+        <tr><td>Файл расписания придёт поздно</td><td>Синтетический график уже готов</td></tr>
+        <tr><td>Формат перевода на оператора для стенда не описан</td><td>Сейчас перевод идёт в очередь Asterisk с карточкой. Если у стенда появится API заявок, мы подключим его</td></tr>
+        <tr><td>Сложность телефонии</td><td>Решение зафиксировано. Адаптеры уже проверены без сети</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Что нам нужно от организаторов</h2>
+    <ul>
+      <li>Токен команды для стенда.</li>
+      <li>Файл расписания врачей.</li>
+      <li>Список справочных вопросов, если он есть.</li>
+      <li>Уточнение: перевод на оператора — живой звонок или заявка через API.</li>
+      <li>Требования к серверу для сдачи.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Как сдаём</h2>
+    <ul>
+      <li>Репозиторий с кодом, документацией, тестами и инструкцией запуска.</li>
+      <li>Рабочее решение на сервере: Asterisk, голосовой сервер, сервер операций.</li>
+      <li>Показ через софтфон. Внешний номер не обязателен.</li>
+    </ul>
+  </section>
+
+  <footer>MedOperatorAI · концепция для чекпоинта · 14.10.2026. Цифры проблемы мы рассчитали по журналам кейса. Результаты тестов относятся к офлайн-проверкам без сети.</footer>
+</main>
+</body>
+</html>
