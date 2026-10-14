@@ -128,6 +128,52 @@ td.rule { font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap;
 .todo-list li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; }
 .note { font-size: 14px; color: var(--muted); }
 footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+/* Call demo: dialogue on the left, server and stand on the right, revealed in one shared order. */
+.call { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.call-head { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--paper); }
+.call-state { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.call-tag { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ok); flex: none; }
+.call.is-playing .dot { animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+.call-btn { font: inherit; font-size: 14px; font-weight: 500; color: var(--accent); background: var(--surface); border: 1px solid var(--accent); border-radius: 999px; padding: 5px 14px; cursor: pointer; }
+.call-btn:hover { background: var(--accent-soft); }
+.call-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dialog { padding: 16px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--line); min-width: 0; }
+.turn { display: flex; flex-direction: column; gap: 3px; max-width: 92%; }
+.turn .who { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.turn .say { padding: 8px 12px; border: 1px solid var(--line); background: var(--paper); border-radius: 4px 12px 12px 12px; font-size: 15px; }
+.turn.bot { align-self: flex-start; }
+.turn.bot .say { background: var(--accent-soft); border-color: transparent; }
+.turn.pat { align-self: flex-end; text-align: right; }
+.turn.pat .say { border-radius: 12px 4px 12px 12px; text-align: left; }
+.server { padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.server-title { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 500; }
+.ev { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5; padding: 5px 10px; border-left: 2px solid var(--line); overflow-wrap: break-word; }
+.ev .nb { white-space: nowrap; }
+.ev.local { color: var(--muted); border-left-style: dashed; }
+.ev.api { border-left-color: var(--accent); }
+.ev .m { font-weight: 500; color: var(--accent); }
+.ev .code { display: inline-block; margin-left: 4px; padding: 0 7px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); font-size: 11.5px; }
+.visit { border: 1px solid var(--ok); border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; background: var(--surface); }
+.visit-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; font-weight: 600; }
+.visit dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 14px; }
+.visit dt { color: var(--muted); }
+.visit dd { margin: 0; font-variant-numeric: tabular-nums; }
+.budget { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-top: auto; padding-top: 6px; }
+.meter { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 30%; background: var(--accent); transition: width .4s ease; }
+.budget b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+[data-step] { transition: opacity .35s ease, transform .35s ease; }
+.call.is-animating [data-step]:not(.shown) { opacity: 0; transform: translateY(6px); }
+@media (prefers-reduced-motion: reduce) {
+  [data-step], .meter i { transition: none; }
+  .call.is-playing .dot { animation: none; }
+}
+@media (max-width: 720px) {
+  .call { grid-template-columns: 1fr; }
+  .dialog { border-right: 0; border-bottom: 1px solid var(--line); }
+}
 @media (max-width: 560px) {
   .layer { grid-template-columns: 1fr; }
   .todo-list li { grid-template-columns: 1fr; gap: 4px; }
@@ -147,6 +193,50 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <section>
     <h2>Кратко</h2>
     <p>Мы делаем голосового ассистента для регистратуры поликлиники. Пациент звонит в поликлинику по IP/SIP. Ассистент понимает запрос и находит врача и свободное время. Он записывает, переносит или отменяет приём в системе «Регистратура». Каждое изменение выполняется только после явного подтверждения пациента. Накануне визита ассистент сам звонит пациенту и уточняет, придёт ли он. Жалобы, медицинские вопросы, острую боль и всё нестандартное ассистент передаёт человеку.</p>
+  </section>
+
+  <section>
+    <h2>Как проходит звонок</h2>
+    <p>Пример записи к врачу. Слева — разговор, справа — что в это время делает наш сервер и какие запросы уходят в стенд.</p>
+    <div class="call" id="call-demo">
+      <div class="call-head">
+        <div class="call-state"><span class="dot" aria-hidden="true"></span><span class="call-state-text" aria-live="polite">Звонок завершён · запись создана</span></div>
+        <span class="call-tag">Пример сценария · вымышленные данные</span>
+        <button type="button" class="call-btn" id="call-play">Проиграть звонок</button>
+      </div>
+      <div class="dialog">
+        <div class="turn bot" data-step="1" data-hold="1900"><span class="who">Ассистент</span><span class="say">Здравствуйте! Регистратура поликлиники, виртуальный помощник. Чем могу помочь?</span></div>
+        <div class="turn pat" data-step="2" data-hold="1500"><span class="who">Пациент</span><span class="say">Запишите меня к терапевту на завтра, после обеда.</span></div>
+        <div class="turn bot" data-step="4" data-hold="1600"><span class="who">Ассистент</span><span class="say">Хорошо. Назовите, пожалуйста, фамилию, имя и дату рождения.</span></div>
+        <div class="turn pat" data-step="5" data-hold="1500"><span class="who">Пациент</span><span class="say">Петрова Анна, пятое мая девяностого года.</span></div>
+        <div class="turn bot" data-step="10" data-hold="2300"><span class="who">Ассистент</span><span class="say">Завтра, в четверг, есть время в четырнадцать пятнадцать, в пятнадцать ноль-ноль и в шестнадцать сорок пять. Какое удобно?</span></div>
+        <div class="turn pat" data-step="11" data-hold="1300"><span class="who">Пациент</span><span class="say">Давайте в пятнадцать.</span></div>
+        <div class="turn bot" data-step="13" data-hold="2500"><span class="who">Ассистент</span><span class="say">Записываю: терапевт Иванова Мария Петровна, четверг, пятнадцатое октября, пятнадцать ноль-ноль. Верно?</span></div>
+        <div class="turn pat" data-step="14" data-hold="1100"><span class="who">Пациент</span><span class="say">Да, верно.</span></div>
+        <div class="turn bot" data-step="18" data-hold="1200"><span class="who">Ассистент</span><span class="say">Готово, вы записаны к терапевту на четверг, пятнадцать ноль-ноль. Могу ещё чем-то помочь?</span></div>
+      </div>
+      <div class="server">
+        <div class="server-title">Сервер и стенд «Регистратура»</div>
+        <div class="ev local" data-step="3" data-hold="900">цель: запись · терапевт · завтра после 12:00</div>
+        <div class="ev api" data-step="6" data-hold="900" data-api="1"><span class="m">GET</span> /clients?<wbr>last_name=Петрова<wbr>&amp;first_name=Анна<wbr>&amp;<span class="nb">birth_date=05.05.1990</span> <span class="code">200 · не найден</span></div>
+        <div class="ev api" data-step="7" data-hold="900" data-api="2"><span class="m">POST</span> /clients <span class="code">201 · client_id 57</span></div>
+        <div class="ev local" data-step="8" data-hold="700">справочник врачей — из кэша, без запроса</div>
+        <div class="ev local" data-step="9" data-hold="900">календарь: 3 свободных слота по 15 мин</div>
+        <div class="ev local" data-step="12" data-hold="800">слот 15:00 зарезервирован</div>
+        <div class="ev local" data-step="15" data-hold="800">подтверждение принято сервером</div>
+        <div class="ev api" data-step="16" data-hold="900" data-api="3"><span class="m">POST</span> /visits {"client_id": 57, "doctor_id": 3, "scheduled_at": "15.10.2026 15:00"} <span class="code">201 · id 1042</span></div>
+        <div class="visit" data-step="17" data-hold="1400">
+          <div class="visit-top"><span>Запись № 1042</span><span class="pill ok">Запланирована</span></div>
+          <dl>
+            <dt>Пациент</dt><dd>Петрова Анна · 05.05.1990</dd>
+            <dt>Врач</dt><dd>Иванова Мария Петровна · терапевт</dd>
+            <dt>Приём</dt><dd>15.10.2026 15:00 (GMT+4)</dd>
+          </dl>
+        </div>
+        <div class="budget"><span>Запросов к стенду за минуту</span><span class="meter" aria-hidden="true"><i></i></span><b><span class="budget-count">3</span> из 10</b></div>
+      </div>
+    </div>
+    <p class="note">Это иллюстрация сценария на вымышленных данных, а не запись реального звонка. Живой SIP-звонок появится на следующем этапе работы.</p>
   </section>
 
   <section>
@@ -367,5 +457,52 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
   <footer>MedOperatorAI · концепция для чекпоинта · 14.10.2026. Цифры проблемы мы рассчитали по журналам кейса. Результаты тестов относятся к офлайн-проверкам без сети.</footer>
 </main>
+<script>
+(function () {
+  var call = document.getElementById('call-demo');
+  if (!call) return;
+  var steps = Array.prototype.slice.call(call.querySelectorAll('[data-step]'))
+    .sort(function (a, b) { return a.dataset.step - b.dataset.step; });
+  var state = call.querySelector('.call-state-text');
+  var btn = document.getElementById('call-play');
+  var bar = call.querySelector('.meter i');
+  var count = call.querySelector('.budget-count');
+  var timer = null, playing = false;
+  function budget(n) { bar.style.width = (n * 10) + '%'; count.textContent = n; }
+  function finish(label) {
+    clearTimeout(timer); playing = false;
+    steps.forEach(function (el) { el.classList.add('shown'); });
+    budget(3);
+    call.classList.remove('is-playing');
+    state.textContent = 'Звонок завершён · запись создана';
+    btn.textContent = label;
+  }
+  function play() {
+    clearTimeout(timer); playing = true;
+    steps.forEach(function (el) { el.classList.remove('shown'); });
+    budget(0);
+    call.classList.add('is-animating', 'is-playing');
+    state.textContent = 'Идёт звонок';
+    btn.textContent = 'Показать итог';
+    var i = 0;
+    function next() {
+      if (i >= steps.length) { finish('Проиграть ещё раз'); return; }
+      var el = steps[i++];
+      el.classList.add('shown');
+      if (el.dataset.api) budget(+el.dataset.api);
+      timer = setTimeout(next, +(el.dataset.hold || 1200));
+    }
+    timer = setTimeout(next, 500);
+  }
+  btn.addEventListener('click', function () { if (playing) finish('Проиграть ещё раз'); else play(); });
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); play(); }
+    }, { threshold: 0.35 });
+    io.observe(call);
+  }
+})();
+</script>
 </body>
 </html>
