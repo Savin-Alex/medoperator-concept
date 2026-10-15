@@ -23,6 +23,12 @@
   --todo: #9a5b17;
   --todo-soft: #f6ead9;
   --danger: #a13636;
+  --c-tel: #50606a; --c-tel-soft: #e8edf0;
+  --c-asr: #6a4ea6; --c-asr-soft: #efe9f8;
+  --c-llm: #0d6b75; --c-llm-soft: #e0eff0;
+  --c-srv: #2f4b8c; --c-srv-soft: #e5ebf7;
+  --c-api: #2c7a4c; --c-api-soft: #e2f1e7;
+  --c-tts: #9a5b17; --c-tts-soft: #f6ead9;
   --font-display: "Unbounded", "Golos Text", system-ui, sans-serif;
   --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -31,13 +37,13 @@
   :root:not([data-theme="light"]) {
     --paper: #0d161a; --surface: #14222a; --ink: #e3ebee; --muted: #9bafb7;
     --line: #26383f; --accent: #5ec2cb; --accent-soft: #163539; --ok: #74cf9b; --ok-soft: #173226;
-    --todo: #e4a65c; --todo-soft: #382915; --danger: #ef8b8b; color-scheme: dark;
+    --todo: #e4a65c; --todo-soft: #382915; --danger: #ef8b8b; --c-tel: #a9b8c0; --c-tel-soft: #22313a; --c-asr: #c2aef0; --c-asr-soft: #2e2546; --c-llm: #5ec2cb; --c-llm-soft: #163539; --c-srv: #a7bdf2; --c-srv-soft: #1f2a45; --c-api: #74cf9b; --c-api-soft: #173226; --c-tts: #e4a65c; --c-tts-soft: #382915; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #0d161a; --surface: #14222a; --ink: #e3ebee; --muted: #9bafb7;
   --line: #26383f; --accent: #5ec2cb; --accent-soft: #163539; --ok: #74cf9b; --ok-soft: #173226;
-  --todo: #e4a65c; --todo-soft: #382915; --danger: #ef8b8b; color-scheme: dark;
+  --todo: #e4a65c; --todo-soft: #382915; --danger: #ef8b8b; --c-tel: #a9b8c0; --c-tel-soft: #22313a; --c-asr: #c2aef0; --c-asr-soft: #2e2546; --c-llm: #5ec2cb; --c-llm-soft: #163539; --c-srv: #a7bdf2; --c-srv-soft: #1f2a45; --c-api: #74cf9b; --c-api-soft: #173226; --c-tts: #e4a65c; --c-tts-soft: #382915; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
@@ -129,6 +135,38 @@ td.rule { font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap;
 .todo-list li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; }
 .note { font-size: 14px; color: var(--muted); }
 footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+.cmp { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .03em; padding: 1px 7px; border-radius: 4px; margin-right: 6px; white-space: nowrap; vertical-align: 1px; }
+.cmp.tel { background: var(--c-tel-soft); color: var(--c-tel); }
+.cmp.asr { background: var(--c-asr-soft); color: var(--c-asr); }
+.cmp.llm { background: var(--c-llm-soft); color: var(--c-llm); }
+.cmp.srv { background: var(--c-srv-soft); color: var(--c-srv); }
+.cmp.api { background: var(--c-api-soft); color: var(--c-api); }
+.cmp.tts { background: var(--c-tts-soft); color: var(--c-tts); }
+.ev.tel { border-left-color: var(--c-tel); } .ev.asr { border-left-color: var(--c-asr); } .ev.llm { border-left-color: var(--c-llm); }
+.ev.srv { border-left-color: var(--c-srv); } .ev.api { border-left-color: var(--c-api); } .ev.tts { border-left-color: var(--c-tts); }
+.ev .fn { color: var(--c-llm); font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; }
+.legend .cmp { margin: 0; }
+.arch { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); overflow: hidden; }
+.arch-row { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: start; }
+.arch-row:last-child { border-bottom: 0; }
+.arch-row .cmp { justify-self: start; margin: 2px 0 0; }
+.arch-row b { display: block; font-weight: 600; margin-bottom: 2px; }
+.arch-row p { color: var(--muted); font-size: 15px; max-width: none; }
+.arch-row.side { background: var(--paper); }
+@media (max-width: 560px) { .arch-row { grid-template-columns: 1fr; gap: 6px; } }
+.map { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.map-title { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 500; }
+.map-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.map-row .to { padding: 0 2px; }
+.node { font-family: var(--font-mono); font-size: 12px; font-weight: 500; padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; transition: opacity .25s ease, box-shadow .25s ease; }
+.node.tel { background: var(--c-tel-soft); color: var(--c-tel); } .node.asr { background: var(--c-asr-soft); color: var(--c-asr); }
+.node.llm { background: var(--c-llm-soft); color: var(--c-llm); } .node.srv { background: var(--c-srv-soft); color: var(--c-srv); }
+.node.api { background: var(--c-api-soft); color: var(--c-api); } .node.tts { background: var(--c-tts-soft); color: var(--c-tts); }
+.call.is-animating .node { opacity: .35; }
+.call.is-animating .node.seen { opacity: 1; }
+.node.now { border-color: currentColor; box-shadow: 0 0 0 2px currentColor; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .node { transition: none; } }
 /* Call demo: dialogue on the left, server and stand on the right, revealed in one shared order. */
 .call { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
 .call-head { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--paper); }
@@ -188,7 +226,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <div class="eyebrow">Хакатон «Точка сборки» · кейс № 2 · DBI</div>
     <h1>MedOperatorAI</h1>
     <p class="subtitle">Голосовой ассистент регистратуры поликлиники</p>
-    <div class="meta"><span>Концепция для чекпоинта</span><span>Состояние на <b>14.10.2026</b></span><span>Пациенты стенда вымышленные</span></div>
+    <div class="meta"><span>Концепция для чекпоинта</span><span>Состояние на <b>15.10.2026</b></span><span>Пациенты стенда вымышленные</span></div>
     <p class="principle"><strong>Главный принцип — ноль ошибочных записей.</strong> Ассистент лучше честно скажет «не удалось» и передаст звонок оператору, чем запишет не того пациента, не к тому врачу или не на то время.</p>
   </header>
 
@@ -199,42 +237,69 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
   <section>
     <h2>Как проходит звонок</h2>
-    <p>Пример записи к врачу. Слева — разговор, справа — что в это время делает наш сервер и какие запросы уходят в стенд.</p>
+    <p>Пример записи к врачу. Сверху — карта всей архитектуры: она подсвечивает компонент, который работает в эту секунду. Слева — разговор. Справа — что делает каждый компонент: Asterisk, медиашлюз, распознавание речи Whisper, языковая модель (LLM), сервер, адаптер стенда, синтез речи Piper и архив.</p>
     <div class="call" id="call-demo">
       <div class="call-head">
         <div class="call-state"><span class="dot" aria-hidden="true"></span><span class="call-state-text" aria-live="polite">Звонок завершён · запись создана</span></div>
         <span class="call-tag">Пример сценария · вымышленные данные</span>
         <button type="button" class="call-btn" id="call-play">Проиграть звонок</button>
       </div>
+      <div class="map" aria-label="Архитектура решения">
+        <div class="map-title">Архитектура · подсвечен компонент, который работает сейчас</div>
+        <div class="map-row"><span class="node tel" data-id="phone">Софтфон</span><span class="to" aria-hidden="true">→</span><span class="node tel" data-id="ast">Asterisk</span><span class="to" aria-hidden="true">→</span><span class="node srv" data-id="gw">Медиашлюз</span><span class="to" aria-hidden="true">→</span><span class="node asr" data-id="asr">Whisper</span><span class="to" aria-hidden="true">→</span><span class="node llm" data-id="chk">LLM-проверки</span><span class="to" aria-hidden="true">→</span><span class="node llm" data-id="dlg">LLM-диалог</span><span class="to" aria-hidden="true">→</span><span class="node srv" data-id="srv">Сервер операций</span><span class="to" aria-hidden="true">→</span><span class="node api" data-id="adp">Адаптер стенда</span><span class="to" aria-hidden="true">→</span><span class="node api" data-id="std">Стенд «Регистратура»</span></div>
+        <div class="map-row"><span>ответ:</span><span class="node tts" data-id="tts">Piper · очередь речи</span><span class="to" aria-hidden="true">→</span><span>Медиашлюз</span><span class="to" aria-hidden="true">→</span><span>Asterisk</span><span class="to" aria-hidden="true">→</span><span>пациент</span><span class="to" aria-hidden="true">·</span><span>журнал:</span><span class="node srv" data-id="arc">Архив и панель</span></div>
+      </div>
       <div class="dialog">
-        <div class="turn bot" data-step="1" data-hold="1900"><span class="who">Ассистент</span><span class="say">Здравствуйте! Регистратура поликлиники, виртуальный помощник. Чем могу помочь?</span></div>
-        <div class="turn pat" data-step="2" data-hold="1500"><span class="who">Пациент</span><span class="say">Запишите меня к терапевту на завтра, после обеда.</span></div>
-        <div class="turn bot" data-step="4" data-hold="1600"><span class="who">Ассистент</span><span class="say">Хорошо. Назовите, пожалуйста, фамилию, имя и дату рождения.</span></div>
-        <div class="turn pat" data-step="5" data-hold="1500"><span class="who">Пациент</span><span class="say">Петрова Анна, пятое мая девяностого года.</span></div>
-        <div class="turn bot" data-step="10" data-hold="2300"><span class="who">Ассистент</span><span class="say">Завтра, в четверг, есть время в четырнадцать пятнадцать, в пятнадцать ноль-ноль и в шестнадцать сорок пять. Какое удобно?</span></div>
-        <div class="turn pat" data-step="11" data-hold="1300"><span class="who">Пациент</span><span class="say">Давайте в пятнадцать.</span></div>
-        <div class="turn bot" data-step="13" data-hold="2500"><span class="who">Ассистент</span><span class="say">Записываю: терапевт Иванова Мария Петровна, четверг, пятнадцатое октября, пятнадцать ноль-ноль. Верно?</span></div>
-        <div class="turn pat" data-step="14" data-hold="1100"><span class="who">Пациент</span><span class="say">Да, верно.</span></div>
-        <div class="turn bot" data-step="18" data-hold="1200"><span class="who">Ассистент</span><span class="say">Готово, вы записаны к терапевту на четверг, пятнадцать ноль-ноль. Могу ещё чем-то помочь?</span></div>
+        <div class="turn bot" data-node="tts gw ast phone" data-step="4" data-hold="1700"><span class="who">Ассистент</span><span class="say">Здравствуйте! Регистратура поликлиники, виртуальный помощник. Чем могу помочь?</span></div>
+        <div class="turn pat" data-node="phone ast gw" data-step="5" data-hold="1400"><span class="who">Пациент</span><span class="say">Запишите меня к терапевту на завтра, после обеда.</span></div>
+        <div class="turn bot" data-node="tts gw ast phone" data-step="12" data-hold="1500"><span class="who">Ассистент</span><span class="say">Хорошо. Назовите, пожалуйста, фамилию, имя и дату рождения.</span></div>
+        <div class="turn pat" data-node="phone ast gw" data-step="13" data-hold="1400"><span class="who">Пациент</span><span class="say">Петрова Анна, пятое мая девяностого года.</span></div>
+        <div class="turn bot" data-node="tts gw ast phone" data-step="21" data-hold="2100"><span class="who">Ассистент</span><span class="say">Завтра, в четверг, у терапевта Малаховой есть время в двенадцать сорок, в четырнадцать двадцать и в шестнадцать сорок. Какое удобно?</span></div>
+        <div class="turn pat" data-node="phone ast gw" data-step="22" data-hold="1200"><span class="who">Пациент</span><span class="say">Давайте в четырнадцать двадцать.</span></div>
+        <div class="turn bot" data-node="tts gw ast phone" data-step="27" data-hold="2300"><span class="who">Ассистент</span><span class="say">Записываю: терапевт Малахова Оксана Григорьевна, четверг, пятнадцатое октября, четырнадцать двадцать, кабинет сто шесть. Верно?</span></div>
+        <div class="turn pat" data-node="phone ast gw" data-step="28" data-hold="1100"><span class="who">Пациент</span><span class="say">Да, верно.</span></div>
+        <div class="turn bot" data-node="tts gw ast phone" data-step="36" data-hold="1100"><span class="who">Ассистент</span><span class="say">Готово, вы записаны к терапевту на четверг, четырнадцать двадцать, кабинет сто шесть. Могу ещё чем-то помочь?</span></div>
       </div>
       <div class="server">
-        <div class="server-title">Сервер и стенд «Регистратура»</div>
-        <div class="ev local" data-step="3" data-hold="900">цель: запись · терапевт · завтра после 12:00</div>
-        <div class="ev api" data-step="6" data-hold="900" data-api="1"><span class="m">GET</span> /clients?<wbr>last_name=Петрова<wbr>&amp;first_name=Анна<wbr>&amp;<span class="nb">birth_date=05.05.1990</span> <span class="code">200 · не найден</span></div>
-        <div class="ev api" data-step="7" data-hold="900" data-api="2"><span class="m">POST</span> /clients <span class="code">201 · client_id 57</span></div>
-        <div class="ev local" data-step="8" data-hold="700">справочник врачей — из кэша, без запроса</div>
-        <div class="ev local" data-step="9" data-hold="900">календарь: 3 свободных слота по 15 мин</div>
-        <div class="ev local" data-step="12" data-hold="800">слот 15:00 зарезервирован</div>
-        <div class="ev local" data-step="15" data-hold="800">подтверждение принято сервером</div>
-        <div class="ev api" data-step="16" data-hold="900" data-api="3"><span class="m">POST</span> /visits {"client_id": 57, "doctor_id": 3, "scheduled_at": "15.10.2026 15:00"} <span class="code">201 · id 1042</span></div>
-        <div class="visit" data-step="17" data-hold="1400">
+        <div class="server-title">Внутри системы</div>
+        <div class="legend"><span class="cmp tel">Asterisk</span><span class="cmp asr">Whisper</span><span class="cmp llm">LLM</span><span class="cmp srv">Сервер</span><span class="cmp api">Стенд</span><span class="cmp tts">Piper</span></div>
+        <div class="ev tel" data-node="phone ast" data-step="1" data-hold="750"><span class="cmp tel">Asterisk</span>входящий SIP-звонок · ARI StasisStart · звук по WebSocket, 16 кГц</div>
+        <div class="ev srv" data-node="srv" data-step="2" data-hold="750"><span class="cmp srv">Сервер</span>приветствие — готовый шаблон сервера, а не текст модели</div>
+        <div class="ev tts" data-node="tts gw ast" data-step="3" data-hold="750"><span class="cmp tts">Piper</span>синтез приветствия → Asterisk проигрывает звук</div>
+        <div class="ev srv" data-node="gw" data-step="5.5" data-hold="800"><span class="cmp srv">Медиашлюз</span>конец фразы пациента → звук на распознавание · если пациент перебьёт бота, речь бота остановится (FLUSH_MEDIA)</div>
+        <div class="ev asr" data-node="gw asr" data-step="6" data-hold="900"><span class="cmp asr">Whisper</span>faster-whisper small, int8 → «запишите меня к терапевту на завтра после обеда»</div>
+        <div class="ev llm" data-node="dlg" data-step="7" data-hold="750"><span class="cmp llm">LLM</span>проверка срочности (screen) → <b>not_detected</b> · JSON-схема · до 1,2 с</div>
+        <div class="ev llm" data-node="dlg" data-step="8" data-hold="750"><span class="cmp llm">LLM</span>намерение (classify), параллельно → <b>unrelated</b>: понятный запрос</div>
+        <div class="ev llm" data-node="dlg" data-step="9" data-hold="750"><span class="cmp llm">LLM</span>диалог → <span class="fn">resolve_need</span>(text: «терапевт») → услуга найдена</div>
+        <div class="ev llm" data-node="dlg" data-step="10" data-hold="750"><span class="cmp llm">LLM</span>диалог → <span class="fn">parse_datetime</span>(text: «завтра после обеда») → 15.10, после обеда</div>
+        <div class="ev tts" data-node="tts gw ast" data-step="11" data-hold="750"><span class="cmp tts">Piper</span>синтез вопроса → Asterisk</div>
+        <div class="ev asr" data-node="gw asr" data-step="14" data-hold="750"><span class="cmp asr">Whisper</span>→ «петрова анна пятое мая девяностого года»</div>
+        <div class="ev llm" data-node="chk" data-step="15" data-hold="750"><span class="cmp llm">LLM</span>срочность → not_detected · намерение → unrelated</div>
+        <div class="ev srv" data-node="srv" data-step="16" data-hold="750"><span class="cmp srv">Сервер</span>личность: «Петрова», «Анна», 05.05.1990 — имя приведено к форме стенда</div>
+        <div class="ev api" data-node="adp std" data-step="17" data-hold="850" data-api="1"><span class="cmp api">Стенд</span><span class="m">GET</span> /clients?<wbr>last_name=Петрова<wbr>&amp;first_name=Анна<wbr>&amp;<span class="nb">birth_date=05.05.1990</span> <span class="code">200 · не найден</span></div>
+        <div class="ev api" data-node="adp std" data-step="18" data-hold="850" data-api="2"><span class="cmp api">Стенд</span><span class="m">POST</span> /clients <span class="code">201 · client_id 57</span></div>
+        <div class="ev llm" data-node="dlg" data-step="19" data-hold="750"><span class="cmp llm">LLM</span>диалог → <span class="fn">find_slots</span>(услуга, дата) → 3 варианта</div>
+        <div class="ev srv" data-node="srv" data-step="20" data-hold="900"><span class="cmp srv">Сервер</span>расписание Excel: у терапевта Малаховой 3 свободных слота по 20 мин · минус занятость и резервы</div>
+        <div class="ev asr" data-node="gw asr" data-step="23" data-hold="750"><span class="cmp asr">Whisper</span>→ «давайте в четырнадцать двадцать»</div>
+        <div class="ev llm" data-node="dlg" data-step="24" data-hold="750"><span class="cmp llm">LLM</span>срочность → not_detected · намерение → unrelated</div>
+        <div class="ev llm" data-node="dlg" data-step="25" data-hold="750"><span class="cmp llm">LLM</span>диалог → <span class="fn">select_and_prepare_booking</span>(вариант 2) → сводка, записи ещё нет</div>
+        <div class="ev srv" data-node="srv" data-step="26" data-hold="900"><span class="cmp srv">Сервер</span>слот 14:20 зарезервирован · сводку произносит шаблон сервера</div>
+        <div class="ev asr" data-node="gw asr" data-step="29" data-hold="750"><span class="cmp asr">Whisper</span>→ «да верно»</div>
+        <div class="ev llm" data-node="chk" data-step="30" data-hold="750"><span class="cmp llm">LLM</span>срочность → not_detected</div>
+        <div class="ev llm" data-node="chk" data-step="31" data-hold="750"><span class="cmp llm">LLM</span>намерение → <b>affirm</b>: подтверждение текущей сводки</div>
+        <div class="ev llm" data-node="chk" data-step="32" data-hold="750"><span class="cmp llm">LLM</span>проверка действия (ACTION_REVIEW) → <b>разрешает</b></div>
+        <div class="ev srv" data-node="srv" data-step="33" data-hold="850"><span class="cmp srv">Сервер</span>согласие принято · операция в журнале, отправка один раз</div>
+        <div class="ev api" data-node="adp std" data-step="34" data-hold="900" data-api="3"><span class="cmp api">Стенд</span><span class="m">POST</span> /visits {"client_id": 57, "doctor_id": 3, "scheduled_at": "15.10.2026 14:20"} <span class="code">201 · id 1042</span></div>
+        <div class="ev srv" data-node="srv" data-step="35" data-hold="850"><span class="cmp srv">Сервер</span>ответ стенда проверен: пациент, врач и время совпадают</div>
+        <div class="visit" data-node="std" data-step="37" data-hold="1400">
           <div class="visit-top"><span>Запись № 1042</span><span class="pill ok">Запланирована</span></div>
           <dl>
             <dt>Пациент</dt><dd>Петрова Анна · 05.05.1990</dd>
-            <dt>Врач</dt><dd>Иванова Мария Петровна · терапевт</dd>
-            <dt>Приём</dt><dd>15.10.2026 15:00 (GMT+4)</dd>
+            <dt>Врач</dt><dd>Малахова Оксана Григорьевна · терапевт · каб. 106</dd>
+            <dt>Приём</dt><dd>15.10.2026 14:20 (GMT+4)</dd>
           </dl>
         </div>
+        <div class="ev srv" data-node="arc" data-step="38" data-hold="1200"><span class="cmp srv">Архив</span>карточка звонка: итог «Запись создана», операции и хронология · аудио и текст — только по политике хранения</div>
         <div class="budget"><span>Запросов к стенду за минуту</span><span class="meter" aria-hidden="true"><i></i></span><b><span class="budget-count">3</span> из 10</b></div>
       </div>
     </div>
@@ -340,23 +405,27 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
 
   <section>
     <h2>Архитектура</h2>
-    <div class="stack">
-      <div class="layer"><div class="name">Софтфон пациента</div><div class="detail">Linphone. Для теста хватает двух софтфонов: «пациент» и «оператор». Внешний номер не обязателен</div><div class="via">SIP ↓</div></div>
-      <div class="layer"><div class="name">Asterisk 22 LTS</div><div class="detail">PJSIP, очередь операторов, клавиша «0»</div><div class="via">ARI — управление звонком · WebSocket — звук 16 кГц ↓</div></div>
-      <div class="layer"><div class="name">Голосовой сервер</div><div class="detail">Распознавание речи faster-whisper и диалоговая модель Qwen3 работают локально. Синтез речи: сейчас Piper, выбран голос «Мария» (Даша SpeechKit), он пока выключен. Одна очередь речи, пациент может перебить</div><div class="via">↓</div></div>
-      <div class="layer"><div class="name">Сервер операций</div><div class="detail">Права пациента и подтверждение, маршрутизация R01–R17, календарь и условия записи, резервы, журнал операций с однократной отправкой</div><div class="via">HTTPS · токен команды · ≤ 10 запросов в минуту ↓</div></div>
-      <div class="layer ext"><div class="name">Стенд «Регистратура»</div><div class="detail">API кейса: врачи, пациенты, записи. Здесь виден результат каждого разговора</div></div>
+    <div class="arch">
+      <div class="arch-row"><span class="cmp tel">Телефония</span><div><b>Софтфон → SIP → Asterisk 22 LTS</b><p>PJSIP, очередь операторов, клавиша «0» для перехода к человеку. Команды и события звонка идут через ARI. Звук идёт через канал WebSocket, 16 кГц.</p></div></div>
+      <div class="arch-row"><span class="cmp srv">Медиашлюз</span><div><b>Буфер звука, конец фразы, перебивание</b><p>Шлюз собирает фразу пациента и отдаёт её на распознавание. Если пациент заговорил во время ответа, шлюз сразу останавливает речь бота командой FLUSH_MEDIA.</p></div></div>
+      <div class="arch-row"><span class="cmp asr">Whisper</span><div><b>Распознавание речи</b><p>faster-whisper small на CPU: int8, beam 5, русский язык. Работает локально, звук не уходит за пределы контура.</p></div></div>
+      <div class="arch-row"><span class="cmp llm">LLM-проверки</span><div><b>Срочность, намерение и проверка действия</b><p>Qwen3-4B (Q4_K_M) в llama.cpp на 127.0.0.1, temperature 0, ответ по строгой JSON-схеме. Срочность и намерение проверяются параллельно на каждой фразе, за 1,2 с. Для «да», «завершить» и «позовите человека» есть отдельная проверка действия.</p></div></div>
+      <div class="arch-row"><span class="cmp llm">LLM-диалог</span><div><b>Ведёт разговор и вызывает инструменты</b><p>Та же модель с вызовом функций, один вызов за шаг, ход до 12 с. Инструменты: поиск услуги и врача, разбор даты, свободные слоты, подготовка записи, переноса и отмены, записи пациента. Модель готовит сводку, но не может выполнить запись.</p></div></div>
+      <div class="arch-row"><span class="cmp srv">Сервер</span><div><b>Сервер операций</b><p>Права пациента, доставка сводки и согласие, маршрутизация R01–R17, календарь и резервы, журнал операций с однократной отправкой. Только сервер решает, выполнять ли действие.</p></div></div>
+      <div class="arch-row"><span class="cmp api">Стенд</span><div><b>Адаптер стенда → «Регистратура»</b><p>Общий лимит 10 запросов в минуту, кэш справочника врачей, сверка неизвестного исхода. В стенде — пациенты, врачи и записи.</p></div></div>
+      <div class="arch-row"><span class="cmp tts">Piper</span><div><b>Ответ пациенту</b><p>Шаблон сервера (приветствие, сводка, итог) или текст модели → одна очередь речи → синтез Piper → Asterisk.</p></div></div>
+      <div class="arch-row side"><span class="cmp srv">Архив</span><div><b>Архив и панель администратора</b><p>Карточки звонков, операции и ошибки. Аудио и текст сохраняются только при включённой политике хранения.</p></div></div>
     </div>
     <div class="table-wrap"><table>
       <thead><tr><th>Компонент</th><th>Решение</th></tr></thead>
       <tbody>
         <tr><td>Сервер</td><td>Python 3.13, ядро без внешних зависимостей, SQLite</td></tr>
-        <tr><td>Модели</td><td>Локальные: faster-whisper, Qwen3, Piper. Cloud.ru — только для сравнения моделей на синтетике</td></tr>
-        <tr><td>Расписание</td><td>Синтетический график: приёмы по 15/20 минут, 14 дней вперёд, запись не позже чем за 30 минут. Когда придёт файл расписания кейса, мы подключим его вместо синтетики</td></tr>
+        <tr><td>Модели</td><td>Сейчас локально: faster-whisper small, Qwen3-4B, Piper. Для сравнения — другие локальные модели и облачные сервисы Yandex, Cloud.ru и SaluteSpeech. Реальные данные пациентов — только в облачном сервисе с аттестатом УЗ-1</td></tr>
+        <tr><td>Расписание</td><td>Файл Excel кейса: 85 врачей, 40 профилей, 136 973 слота на 25.06–31.12.2026, приёмы по 20–60 минут, отпуска и больничные. Файл уже прочитан и проверен. Пациенту предлагаем свободные слоты на 14 дней вперёд, не позже чем за 30 минут до начала</td></tr>
         <tr><td>Панель</td><td>Веб-панель администратора: звонки, аудио, расшифровки, ошибки. Это рабочий инструмент администратора. Главный результат проекта — голосовой сценарий</td></tr>
       </tbody>
     </table></div>
-    <p class="note">Весь стек открытый, кроме выбранного голоса. Голос включается отдельным решением.</p>
+    <p class="note">Основной стек открытый и работает локально. Облачные модели — только опция: при сбое работает локальная модель.</p>
   </section>
 
   <section>
@@ -374,10 +443,10 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <section>
     <h2>Что уже сделано</h2>
     <p>Мы разобрали задание и материалы кейса: журналы, регламент регистратуры, OpenAPI стенда. Все 97 утверждений задания мы сверили с проектом. Мы написали контракт продукта 2.2.0, таблицу перевода R01–R17, 12 сценариев приёмки и 16 контрольных диалогов по регламенту. Мы выбрали телефонию: Asterisk 22 LTS.</p>
-    <div class="tally"><span class="big">1 279 / 1 279</span><span class="small">офлайн-тестов прошли в последней принятой проверке. Мы сделали 16 модулей, каждый прошёл отдельную приёмку</span></div>
+    <div class="tally"><span class="big">1 382 / 1 382</span><span class="small">офлайн-тестов прошли в последней принятой проверке. Мы сделали 18 модулей, каждый прошёл отдельную приёмку</span></div>
     <div class="done-grid">
       <div class="area"><h3>Диалог и подтверждение <span class="pill ok">офлайн</span></h3><p>Маршрутизация R01–R17 в протоколе подтверждения. Права вымышленных пациентов, включая ребёнка через представителя</p></div>
-      <div class="area"><h3>Запись в стенд <span class="pill ok">офлайн</span></h3><p>Календарь и подготовка записи. Создание записи с однократной отправкой. Перенос и отмена одним PATCH. Кодек API, общий лимит, поиск и создание пациента</p></div>
+      <div class="area"><h3>Запись в стенд <span class="pill ok">офлайн</span></h3><p>Чтение и проверка Excel-расписания. Календарь и подготовка записи. Создание записи с однократной отправкой. Перенос и отмена одним PATCH. Кодек API, общий лимит, поиск и создание пациента</p></div>
       <div class="area"><h3>Телефония <span class="pill ok">офлайн</span></h3><p>Управление звонком через ARI, аудиопоток с перебиванием, восстановление аудиосоединения, сетевой адаптер ARI. Живое подключение пока закрыто</p></div>
       <div class="area"><h3>Архив и панель <span class="pill ok">офлайн</span></h3><p>Карточки звонков, рабочие отметки, хранение аудио и расшифровок, журнал доступа, вход, список звонков, просмотр аудио и текста</p></div>
     </div>
@@ -391,7 +460,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
       <li><span class="pill todo">не подтверждено</span><span><b>Качество голосового диалога.</b> Последняя серия голосовых проверок прошла частично. Открыт дефект: короткое «спасибо» однажды приняли за согласие.</span></li>
       <li><span class="pill todo">не подключено</span><span><b>Распознавание жалоб для перевода.</b> Правила перевода и серверная часть готовы.</span></li>
       <li><span class="pill todo">нет</span><span><b>Фонового обзвона.</b> Планировщик готов, хранилища контактов нет.</span></li>
-      <li><span class="pill todo">не получен</span><span><b>Файл расписания.</b> Мы работаем на синтетическом графике.</span></li>
+      <li><span class="pill todo">не сопоставлено</span><span><b>Врачи расписания и стенда.</b> Файл Excel прочитан и проверен. Сопоставить его врачей с врачами стенда можно после получения токена.</span></li>
     </ul>
   </section>
 
@@ -430,7 +499,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
         <tr><td>Локальные модели отвечают медленно</td><td>Цель: ответ без поиска — p50 ≤ 1,5 с, с поиском — p95 ≤ 5 с. Короткие фразы ожидания. Замер на живом звонке</td></tr>
         <tr><td>Лимит 10 запросов в минуту</td><td>Общий бюджет, кэш, локальная копия данных, приоритет входящих звонков</td></tr>
         <tr><td>Потерян ответ стенда</td><td>Неизвестный исход и сверка, без повторной записи</td></tr>
-        <tr><td>Файл расписания придёт поздно</td><td>Синтетический график уже готов</td></tr>
+        <tr><td>Врачи в файле расписания и в стенде не совпадут</td><td>Точное сопоставление по ФИО и профилю. Без сопоставления ассистент не предлагает слот</td></tr>
         <tr><td>Формат перевода на оператора для стенда не описан</td><td>Сейчас перевод идёт в очередь Asterisk с карточкой. Если у стенда появится API заявок, мы подключим его</td></tr>
         <tr><td>Сложность телефонии</td><td>Решение зафиксировано. Адаптеры уже проверены без сети</td></tr>
       </tbody>
@@ -441,7 +510,6 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <h2>Что нам нужно от организаторов</h2>
     <ul>
       <li>Токен команды для стенда.</li>
-      <li>Файл расписания врачей.</li>
       <li>Список справочных вопросов, если он есть.</li>
       <li>Уточнение: перевод на оператора — живой звонок или заявка через API.</li>
       <li>Требования к серверу для сдачи.</li>
@@ -457,7 +525,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     </ul>
   </section>
 
-  <footer>MedOperatorAI · команда «Синергия» · концепция для чекпоинта · 14.10.2026. Цифры проблемы мы рассчитали по журналам кейса. Результаты тестов относятся к офлайн-проверкам без сети.</footer>
+  <footer>MedOperatorAI · команда «Синергия» · концепция для чекпоинта · 15.10.2026. Цифры проблемы мы рассчитали по журналам кейса. Результаты тестов относятся к офлайн-проверкам без сети.</footer>
 </main>
 <script>
 (function () {
@@ -470,10 +538,19 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   var bar = call.querySelector('.meter i');
   var count = call.querySelector('.budget-count');
   var timer = null, playing = false;
+  var nodes = call.querySelectorAll('.node');
+  function mapAll(seen) { nodes.forEach(function (n) { n.classList.toggle('seen', seen); n.classList.remove('now'); }); }
+  function light(el) {
+    var ids = (el.dataset.node || '').split(' ').filter(Boolean);
+    if (!ids.length) return;
+    nodes.forEach(function (n) { n.classList.remove('now'); });
+    ids.forEach(function (id) { var n = call.querySelector('.node[data-id="' + id + '"]'); if (n) n.classList.add('seen', 'now'); });
+  }
   function budget(n) { bar.style.width = (n * 10) + '%'; count.textContent = n; }
   function finish(label) {
     clearTimeout(timer); playing = false;
     steps.forEach(function (el) { el.classList.add('shown'); });
+    mapAll(true);
     budget(3);
     call.classList.remove('is-playing');
     state.textContent = 'Звонок завершён · запись создана';
@@ -482,6 +559,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   function play() {
     clearTimeout(timer); playing = true;
     steps.forEach(function (el) { el.classList.remove('shown'); });
+    mapAll(false);
     budget(0);
     call.classList.add('is-animating', 'is-playing');
     state.textContent = 'Идёт звонок';
@@ -491,6 +569,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
       if (i >= steps.length) { finish('Проиграть ещё раз'); return; }
       var el = steps[i++];
       el.classList.add('shown');
+      light(el);
       if (el.dataset.api) budget(+el.dataset.api);
       timer = setTimeout(next, +(el.dataset.hold || 1200));
     }
