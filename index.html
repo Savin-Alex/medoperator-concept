@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Концепция голосового ассистента регистратуры для чекпоинта хакатона «Точка сборки», кейс № 2.">
-<title>Концепция MedOperatorAI</title>
+<title>Концепция MedOperatorAI · вариант 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: one reading column, like a registry case file; status pills mark what works today. */
 :root {
@@ -218,8 +218,82 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   .todo-list li { grid-template-columns: 1fr; gap: 4px; }
 }
 </style>
+
+<style>
+/* Variant 2: colors of the presentation and the admin-panel prototype. Later rules override the base tokens. */
+:root {
+  --paper: #f7fafe; --surface: #ffffff; --ink: #1d2148; --muted: #6e759f; --line: #e3e8f3;
+  --accent: #6a3ff2; --accent-soft: #efeefd; --ok: #148a5b; --ok-soft: #e3fef3; --todo: #a8651f; --todo-soft: #fef5d8; --danger: #d6045f;
+  --navy: #282a74; --badge: #616ad8;
+  --grad: linear-gradient(90deg, #12e7fa 0%, #0fc5fb 22%, #8b59f7 52%, #f63ffb 80%, #f544fa 100%);
+  --btn: linear-gradient(90deg, #054bff 0%, #af38fd 100%);
+  --c-tel: #282a74; --c-tel-soft: #eceef8; --c-asr: #0a85aa; --c-asr-soft: #e0f8fe;
+  --c-llm: #054bff; --c-llm-soft: #e6edff; --c-srv: #5b34e6; --c-srv-soft: #efeefd;
+  --c-api: #148a5b; --c-api-soft: #e3fef3; --c-tts: #b8158f; --c-tts-soft: #feebfc;
+  --font-display: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1131; --surface: #171a45; --ink: #e7e9ff; --muted: #a6abd8; --line: #2b2f68;
+    --accent: #a48bff; --accent-soft: #262457; --ok: #6fdcaa; --ok-soft: #133528; --todo: #f0b46a; --todo-soft: #3a2a14; --danger: #ff79b0;
+    --navy: #1b1d57; --badge: #616ad8;
+    --c-tel: #b9bff0; --c-tel-soft: #23275e; --c-asr: #6fdcf6; --c-asr-soft: #10324a; --c-llm: #8fb0ff; --c-llm-soft: #1a2a66;
+    --c-srv: #b8a6ff; --c-srv-soft: #2a2563; --c-api: #6fdcaa; --c-api-soft: #133528; --c-tts: #ff8fe0; --c-tts-soft: #3d1640;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1131; --surface: #171a45; --ink: #e7e9ff; --muted: #a6abd8; --line: #2b2f68;
+  --accent: #a48bff; --accent-soft: #262457; --ok: #6fdcaa; --ok-soft: #133528; --todo: #f0b46a; --todo-soft: #3a2a14; --danger: #ff79b0;
+  --navy: #1b1d57; --badge: #616ad8;
+  --c-tel: #b9bff0; --c-tel-soft: #23275e; --c-asr: #6fdcf6; --c-asr-soft: #10324a; --c-llm: #8fb0ff; --c-llm-soft: #1a2a66;
+  --c-srv: #b8a6ff; --c-srv-soft: #2a2563; --c-api: #6fdcaa; --c-api-soft: #133528; --c-tts: #ff8fe0; --c-tts-soft: #3d1640;
+  color-scheme: dark;
+}
+body { padding-block: 0 64px; }
+.appbar { background: var(--navy); color: #fff; margin-inline: -16px; margin-bottom: 32px; position: relative; }
+.appbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 4px; background: var(--grad); }
+.appbar-in { max-width: 1180px; margin: 0 auto; padding: 0 16px; min-height: 60px; display: flex; align-items: center; gap: 26px; flex-wrap: nowrap; }
+.appbar .logo { font-weight: 700; font-size: 19px; letter-spacing: -0.01em; }
+.appbar nav { display: flex; gap: 16px; font-size: 14px; flex-wrap: nowrap; white-space: nowrap; }
+.appbar nav a { color: rgba(255,255,255,.75); text-decoration: none; padding: 19px 0 17px; border-bottom: 3px solid transparent; }
+.appbar nav a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
+.appbar nav a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.appbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 14px; white-space: nowrap; }
+.appbar .badge { background: var(--badge); border-radius: 5px; padding: 2px 8px; font-size: 11px; font-weight: 600; letter-spacing: .05em; }
+@media (max-width: 1000px) { .appbar nav { display: none; } }
+@media (max-width: 420px) { .appbar .right { display: none; } .appbar .tt { margin-left: auto; } }
+h1, h2 { font-weight: 700; letter-spacing: -0.015em; }
+h2 { font-size: 23px; }
+.case { border-radius: 14px; box-shadow: 0 1px 2px rgba(40,42,116,.06); }
+.team { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; align-self: flex-start; }
+.principle { border-left-color: #774fff; border-radius: 0 10px 10px 0; }
+.table-wrap, .call, .arch, .done-grid .area, .card { border-radius: 14px; }
+.call-btn { background: var(--btn); color: #fff; border: 0; padding: 7px 16px; border-radius: 8px; }
+.call-btn:hover { background: var(--btn); filter: brightness(1.08); }
+.call-btn:focus-visible { outline: 2px solid #774fff; outline-offset: 2px; }
+.dot { background: #12c98a; }
+.flow li::before { background: var(--btn); color: #fff; border: 0; }
+.pill { border-radius: 6px; }
+.tally .big { background: var(--btn); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.visit { border-left-width: 5px; }
+section > h2 { border-bottom-color: var(--line); }
+.tt { flex: none; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; padding: 0; }
+.tt:hover { background: rgba(255,255,255,.16); }
+.tt:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.tt svg { width: 18px; height: 18px; display: block; }
+.tt .sun { display: none; }
+:root[data-theme="dark"] .tt .sun { display: block; }
+:root[data-theme="dark"] .tt .moon { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tt .sun { display: block; } :root:not([data-theme="light"]) .tt .moon { display: none; } }
+</style>
+<script>try { var t = localStorage.getItem('medoperator-theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
 </head>
 <body>
+<header class="appbar"><div class="appbar-in"><span class="logo">MedOperatorAI</span>
+  <nav aria-label="Разделы"><a href="#call">Звонок</a><a href="#problem">Проблема</a><a href="#success">Успех</a><a href="#arch">Архитектура</a><a href="#data">Данные</a><a href="#done">Сделано</a><a href="#plan">План</a></nav>
+  <div class="right"><span>Команда «Синергия»</span><span class="badge">ХАКАТОН</span></div><button type="button" class="tt" id="theme-toggle" aria-label="Включить тёмную тему" title="Тёмная тема"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button></div></header>
 <main class="page">
   <header class="case">
     <div class="team">Команда «Синергия»</div>
@@ -235,7 +309,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <p>Мы делаем голосового ассистента для регистратуры поликлиники. Пациент звонит в поликлинику по IP/SIP. Ассистент понимает запрос и находит врача и свободное время. Он записывает, переносит или отменяет приём в системе «Регистратура». Каждое изменение выполняется только после явного подтверждения пациента. Накануне визита ассистент сам звонит пациенту и уточняет, придёт ли он. Жалобы, медицинские вопросы, острую боль и всё нестандартное ассистент передаёт человеку.</p>
   </section>
 
-  <section>
+  <section id="call">
     <h2>Как проходит звонок</h2>
     <p>Пример записи к врачу. Сверху — карта всей архитектуры: она подсвечивает компонент, который работает в эту секунду. Слева — разговор. Справа — что делает каждый компонент: Asterisk, медиашлюз, распознавание речи Whisper, языковая модель (LLM), сервер, адаптер стенда, синтез речи Piper и архив.</p>
     <div class="call" id="call-demo">
@@ -306,7 +380,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <p class="note">Это иллюстрация сценария на вымышленных данных, а не запись реального звонка. Живой SIP-звонок появится на следующем этапе работы.</p>
   </section>
 
-  <section>
+  <section id="problem">
     <h2>Проблема</h2>
     <p>Мы проанализировали журналы кейса: 17 772 звонка за три месяца и 35 470 приёмов за полгода. Данные подтверждают задачу.</p>
     <div class="table-wrap"><table>
@@ -322,7 +396,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <p>Типовые звонки составляют основную долю. Значит, ассистент может снять большую часть нагрузки с регистраторов. Запись через ассистента должна занимать меньше 166,6 с. Регламент поликлиники ставит цель 2,5 минуты.</p>
   </section>
 
-  <section>
+  <section id="success">
     <h2>Что считаем успехом</h2>
     <p>Решение работает, если после голосового разговора в стенде «Регистратура» появляется нужное изменение. Изменение сделано токеном нашей команды, для того пациента, с которым говорил ассистент, и для врача, которого он просил. Наш первый приоритет — ноль ошибок в записи. Второй — как можно больше звонков без участия оператора.</p>
     <div class="table-wrap"><table>
@@ -403,7 +477,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     </table></div>
   </section>
 
-  <section>
+  <section id="arch">
     <h2>Архитектура</h2>
     <div class="arch">
       <div class="arch-row"><span class="cmp tel">Телефония</span><div><b>Софтфон → SIP → Asterisk 22 LTS</b><p>PJSIP, очередь операторов, клавиша «0» для перехода к человеку. Команды и события звонка идут через ARI. Звук идёт через канал WebSocket, 16 кГц.</p></div></div>
@@ -428,7 +502,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <p class="note">Основной стек открытый и работает локально. Облачные модели — только опция: при сбое работает локальная модель.</p>
   </section>
 
-  <section>
+  <section id="data">
     <h2>Данные и 152-ФЗ</h2>
     <ul>
       <li>В стенде только вымышленные пациенты. Реальные персональные данные в систему не попадают.</li>
@@ -440,7 +514,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     </ul>
   </section>
 
-  <section>
+  <section id="done">
     <h2>Что уже сделано</h2>
     <p>Мы разобрали задание и материалы кейса: журналы, регламент регистратуры, OpenAPI стенда. Все 97 утверждений задания мы сверили с проектом. Мы написали контракт продукта 2.2.0, таблицу перевода R01–R17, 12 сценариев приёмки и 16 контрольных диалогов по регламенту. Мы выбрали телефонию: Asterisk 22 LTS.</p>
     <div class="tally"><span class="big">1 382 / 1 382</span><span class="small">офлайн-тестов прошли в последней принятой проверке. Мы сделали 18 модулей, каждый прошёл отдельную приёмку</span></div>
@@ -464,7 +538,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     </ul>
   </section>
 
-  <section>
+  <section id="plan">
     <h2>План до финала</h2>
     <p>Дальше мы сосредоточены на голосовом сценарии и правильном результате в стенде.</p>
     <div class="table-wrap"><table>
@@ -583,6 +657,30 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     }, { threshold: 0.9 });
     io.observe(call.querySelector('.call-head'));
   }
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle'), KEY = 'medoperator-theme';
+  if (!btn) return;
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t === 'dark' || t === 'light') return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function label() {
+    var dark = current() === 'dark';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+    btn.title = dark ? 'Светлая тема' : 'Тёмная тема';
+  }
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+    label();
+  });
+  if (window.matchMedia) { try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label); } catch (e) {} }
+  label();
 })();
 </script>
 </body>
