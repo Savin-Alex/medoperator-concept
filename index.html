@@ -580,8 +580,8 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   if (!reduce && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); play(); }
-    }, { threshold: 0.35 });
-    io.observe(call);
+    }, { threshold: 0.9 });
+    io.observe(call.querySelector('.call-head'));
   }
 })();
 </script>
